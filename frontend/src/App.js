@@ -6,6 +6,7 @@ import {
   Route,
 } from "react-router-dom";
 
+import Dashboard from "./Dashboard/Dashboard";
 import Payment from "./Payment/paymentform";
 import Form from "./Payment/form";
 import Success from "./Payment/success";
@@ -52,6 +53,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Payment />} />
+          <Route path="/dash" element={<Dashboard />} />
           <Route path="/form" element={<Form />} />
           <Route path="/success/:id" element={<Success />} />
           <Route path="/unsuccess" element={<UnSuccess />} />
