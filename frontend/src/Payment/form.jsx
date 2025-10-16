@@ -103,43 +103,49 @@ export default function PaymentPage() {
     return exp >= now;
   };
 
-  const onFinish = async (values) => {
-    const amount = parseFloat(values.amount);
+// pages/PaymentPage.jsx (inside onFinish)
+const onFinish = async (values) => {
+  const amount = parseFloat(values.amount);
 
-    if (isNaN(amount) || amount <= 0) {
-      message.warning("Please enter a valid payment amount 💳");
-      return;
-    }
-    if (!isExpiryValid(values.expiry)) {
-      message.error("Card has expired or the date is invalid.");
-      return;
-    }
+  if (isNaN(amount) || amount <= 0) {
+    message.warning("Please enter a valid payment amount 💳");
+    return;
+  }
+  if (!isExpiryValid(values.expiry)) {
+    message.error("Card has expired or the date is invalid.");
+    return;
+  }
 
-    setSubmitting(true);
+  setSubmitting(true);
 
-    try {
-      const res = await axios.post("http://localhost:5000/api/bills", {
-        amount: values.amount,
-        paymentMethod: selectedMethod ? selectedMethod._id || selectedMethod.id : null,
-        senderName: values.cardName,
-      });
+  try {
+    // ✅ decide status client-side using your existing logic
+    const status = amount <= balance ? "success" : "failed";
 
-      if (amount <= balance) {
-        const newBalance = balance - amount;
-        setBalance(newBalance);
-        clearTimeoutFn();
-        form.resetFields();
-        navigate(`/success/${res.data._id}`);
-      } else {
-        navigate(`/unsuccess/${res.data._id}`);
-      }
-    } catch (err) {
+    const res = await axios.post("http://localhost:5000/api/bills", {
+      amount: values.amount,
+      paymentMethod: selectedMethod ? selectedMethod._id || selectedMethod.id : null,
+      senderName: values.cardName,
+      status, // ✅ save it at creation
+    });
+
+    if (status === "success") {
+      const newBalance = balance - amount;
+      setBalance(newBalance);
       clearTimeoutFn();
-      message.error("Failed to store payment");
-    } finally {
-      setSubmitting(false);
+      form.resetFields();
+      navigate(`/success/${res.data._id}`);
+    } else {
+      navigate(`/unsuccess/${res.data._id}`);
     }
-  };
+  } catch (err) {
+    clearTimeoutFn();
+    message.error("Failed to store payment");
+  } finally {
+    setSubmitting(false);
+  }
+};
+
 
   return (
     <Layout style={{ minHeight: "100vh", background: "#fff" }}>

@@ -33,7 +33,7 @@ import dayjs from "dayjs";
 import PaymentModal from "../Components/PaymentModal";
 import { useBalance } from "../context/BalanceContext";
 
-// ⬇️ PDF libs
+// PDF libs
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
@@ -314,47 +314,67 @@ export default function PaymentsPage() {
               <Text type="secondary">No bills to display yet.</Text>
             </Card>
           )}
-          {bills.map((b) => (
-            <Card
-              key={b._id || b.id}
-              hoverable
-              bodyStyle={{ padding: 14 }}
-              style={{
-                borderRadius: 16,
-                boxShadow: "0 1px 0 rgba(0,0,0,0.02)",
-              }}
-            >
-              <Row align="middle" justify="space-between">
-                <Space size={12} align="center">
-                  <Avatar
-                    size={40}
-                    icon={<FileTextOutlined />}
-                    style={{ background: "#eafff1", color: "#16a34a" }}
-                  />
-                  <div style={{ lineHeight: 1.1 }}>
-                    <Text strong style={{ display: "block" }}>
-                      {b.month || dayjs(b.paidAt).format("MMMM YYYY")}
-                    </Text>
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                      Paid on {dayjs(b.paidAt).format("MMMM D, YYYY")}
-                    </Text>
-                  </div>
-                </Space>
 
-                <Space size={12} align="center">
-                  <Text strong style={{ whiteSpace: "nowrap" }}>
-                    LKR {b.amount}
-                  </Text>
-                  <Button
-                    type="text"
-                    icon={<DownloadOutlined />}
-                    onClick={() => handleDownload(b)}
-                    title="Download receipt"
-                  />
-                </Space>
-              </Row>
-            </Card>
-          ))}
+          {bills.map((b) => {
+            const isFailed = ["failed", "unsuccess", "unsuccessful", "unsecces"].includes(
+              String(b.status || "").toLowerCase()
+            );
+
+            return (
+              <Card
+                key={b._id || b.id}
+                hoverable
+                bodyStyle={{ padding: 14 }}
+                style={{
+                  borderRadius: 16,
+                  boxShadow: "0 1px 0 rgba(0,0,0,0.02)",
+                }}
+              >
+                <Row align="middle" justify="space-between">
+                  <Space size={12} align="center">
+                    <Avatar
+                      size={40}
+                      icon={<FileTextOutlined />}
+                      style={{
+                        background: isFailed ? "#ffecec" : "#eafff1",
+                        color: isFailed ? "#ff4d4f" : "#16a34a",
+                      }}
+                    />
+                    <div style={{ lineHeight: 1.1 }}>
+                      <Text strong style={{ display: "block" }}>
+                        {b.month || dayjs(b.paidAt).format("MMMM YYYY")}
+                      </Text>
+                      <Text
+                        type={isFailed ? "danger" : "secondary"}
+                        style={{ fontSize: 12 }}
+                      >
+                        {(isFailed ? "Attempted on " : "Paid on ") +
+                          dayjs(b.paidAt).format("MMMM D, YYYY")}
+                      </Text>
+                    </div>
+                  </Space>
+
+                  <Space size={12} align="center">
+                    <Text
+                      strong
+                      style={{
+                        whiteSpace: "nowrap",
+                        color: isFailed ? "#ff4d4f" : undefined,
+                      }}
+                    >
+                      LKR {b.amount}
+                    </Text>
+                    <Button
+                      type="text"
+                      icon={<DownloadOutlined />}
+                      onClick={() => handleDownload(b)}
+                      title="Download receipt"
+                    />
+                  </Space>
+                </Row>
+              </Card>
+            );
+          })}
         </Space>
       </Content>
 
