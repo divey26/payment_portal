@@ -57,7 +57,7 @@ export default function PaymentPage() {
     timeoutRef.current = setTimeout(() => {
       setTimeoutActive(true);
       setShowTimeout(true); 
-    }, 20000); // 10 seconds
+    }, 30000); // 30 seconds
     setTimeoutActive(true);
   };
 
@@ -131,7 +131,7 @@ export default function PaymentPage() {
         form.resetFields();
         navigate(`/success/${res.data._id}`);
       } else {
-        navigate("/");
+        navigate(`/unsuccess/${res.data._id}`);
       }
     } catch (err) {
       clearTimeoutFn();
@@ -160,7 +160,7 @@ export default function PaymentPage() {
           <Col>
             <Space size={12} align="center">
               <LeftOutlined />
-              <Button type="text" onClick={() => navigate(-1)}>
+              <Button type="text" onClick={() => navigate('/')}>
                 Back
               </Button>
             </Space>
@@ -415,8 +415,7 @@ export default function PaymentPage() {
         ]}
       >
         <Text>
-          Your payment session timed out after 10 seconds. You can restart the session to continue.
-          Your payment session timed out after 20 seconds. You can restart the session to continue.
+          Your payment session timed out after 30 seconds. You can restart the session to continue.
         </Text>
       </Modal>
 

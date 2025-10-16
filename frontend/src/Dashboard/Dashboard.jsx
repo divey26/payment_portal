@@ -97,7 +97,7 @@ export default function Dashboard() {
       </Header>
 
       <Content style={{ padding: 16, paddingBottom: 88 }}>
-        <Space direction="vertical" size={16} style={{ width: "100%" }}>
+        <Space direction="vertical" size={20} style={{ width: "100%" }}>
           {/* Balance Card */}
           <div
             style={{
@@ -107,20 +107,26 @@ export default function Dashboard() {
                 "linear-gradient(135deg, rgba(42,194,133,1) 0%, rgba(45,158,224,1) 100%)",
               color: "#fff",
               boxShadow: "0 6px 18px rgba(0,0,0,0.08)",
+              height: 170,
             }}
           >
             <Row justify="space-between" align="top">
               <Col>
-                <Space direction="vertical" size={6}>
+                <Space direction="vertical" size={6} >
                   <Text style={{ color: "rgba(255,255,255,0.9)" }}>
                     Current Balance
                   </Text>
+                  
                   <Title
                     level={2}
                     style={{ color: "#fff", margin: 0, lineHeight: 1.1 }}
+                    marginTop={10}
                   >
                     LKR {balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </Title>
+                  
+                  <br/>
+                  <br/>
                   <Space size={8} align="center">
                     <CalendarOutlined />
                     <Text style={{ color: "rgba(255,255,255,0.9)" }}>

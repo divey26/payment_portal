@@ -7,6 +7,7 @@ const billSchema = new mongoose.Schema(
     reference: { type: String, required: true }, // Reference number
     senderName: { type: String, required: true }, // Sender name
     paidAt: { type: Date, default: Date.now }, // Time of payment
+  
   },
   { timestamps: true }
 );

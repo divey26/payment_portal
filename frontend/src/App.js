@@ -56,7 +56,7 @@ function App() {
           <Route path="/dash" element={<Dashboard />} />
           <Route path="/form" element={<Form />} />
           <Route path="/success/:id" element={<Success />} />
-          <Route path="/unsuccess" element={<UnSuccess />} />
+          <Route path="/unsuccess/:id" element={<UnSuccess />} />
         </Routes>
       </Router>
     </BalanceProvider>
