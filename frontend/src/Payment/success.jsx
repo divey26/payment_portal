@@ -1,5 +1,5 @@
 // PaymentSuccess.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   ConfigProvider,
   Layout,
@@ -11,7 +11,7 @@ import {
   Space,
   Divider,
   Spin,
-} from "antd";
+} from 'antd';
 import {
   CheckCircleFilled,
   HomeOutlined,
@@ -20,13 +20,14 @@ import {
   UserOutlined,
   LeftOutlined,
   BellOutlined,
-} from "@ant-design/icons";
-import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+} from '@ant-design/icons';
+import { useParams, useNavigate } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import axios from 'axios';
 
 // ✅ Use the function form to avoid instance/patch issues
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const { Header, Content, Footer } = Layout;
 const { Text, Title } = Typography;
@@ -46,67 +47,64 @@ export default function PaymentSuccess() {
   }, [id]);
 
   const fmtLKR = (n) =>
-    new Intl.NumberFormat("en-LK", { style: "currency", currency: "LKR" }).format(
-      Number(n || 0)
-    );
-  const safeDateTime = (v) =>
-    v ? new Date(v).toLocaleString() : new Date().toLocaleString();
+    new Intl.NumberFormat('en-LK', { style: 'currency', currency: 'LKR' }).format(Number(n || 0));
+  const safeDateTime = (v) => (v ? new Date(v).toLocaleString() : new Date().toLocaleString());
 
   const handleDownload = () => {
     if (!data) return;
 
-    const doc = new jsPDF({ unit: "pt", format: "a5", orientation: "portrait" });
+    const doc = new jsPDF({ unit: 'pt', format: 'a5', orientation: 'portrait' });
     const pageW = doc.internal.pageSize.getWidth();
     const marginX = 24;
 
     // Header band
     doc.setFillColor(0, 200, 83);
-    doc.roundedRect(0, 0, pageW, 64, 0, 0, "F");
-    doc.setFont("helvetica", "bold");
+    doc.roundedRect(0, 0, pageW, 64, 0, 0, 'F');
+    doc.setFont('helvetica', 'bold');
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(16);
-    doc.text("Payment Receipt", marginX, 38);
+    doc.text('Payment Receipt', marginX, 38);
     doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    doc.text(`Reference: ${data.reference || "-"}`, marginX, 54);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Reference: ${data.reference || '-'}`, marginX, 54);
 
     // PAID badge
     doc.setDrawColor(255, 255, 255);
     doc.setLineWidth(1);
     doc.setTextColor(255, 255, 255);
-    doc.setFont("helvetica", "bold");
+    doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
-    const paidW = doc.getTextWidth("PAID") + 14;
-    doc.roundedRect(pageW - paidW - marginX, 22, paidW, 20, 6, 6, "S");
-    doc.text("PAID", pageW - paidW - marginX + 7, 37);
+    const paidW = doc.getTextWidth('PAID') + 14;
+    doc.roundedRect(pageW - paidW - marginX, 22, paidW, 20, 6, 6, 'S');
+    doc.text('PAID', pageW - paidW - marginX + 7, 37);
 
     // Body
     let y = 84;
     doc.setTextColor(0, 0, 0);
 
     // Amount big
-    doc.setFont("helvetica", "bold");
+    doc.setFont('helvetica', 'bold');
     doc.setFontSize(20);
     doc.text(fmtLKR(data.amount), marginX, y);
 
     // Success text
     doc.setFontSize(11);
     doc.setTextColor(0, 200, 83);
-    doc.text("Payment Success", marginX, (y += 18));
+    doc.text('Payment Success', marginX, (y += 18));
     doc.setTextColor(0, 0, 0);
 
     const details = [
-      ["Ref Number", data.reference || "-"],
-      ["Payment Time", safeDateTime(data.paidAt)],
-      ["Payment Method", data?.paymentMethod?.title || "Card Payment"],
-      ["Sender Name", data?.senderName || "-"],
-      ["Amount", fmtLKR(data.amount)],
+      ['Ref Number', data.reference || '-'],
+      ['Payment Time', safeDateTime(data.paidAt)],
+      ['Payment Method', data?.paymentMethod?.title || 'Card Payment'],
+      ['Sender Name', data?.senderName || '-'],
+      ['Amount', fmtLKR(data.amount)],
     ];
 
     // ✅ Call the plugin function instead of doc.autoTable(...)
     autoTable(doc, {
       startY: y + 12,
-      head: [["Field", "Value"]],
+      head: [['Field', 'Value']],
       body: details,
       styles: { fontSize: 10, cellPadding: 6 },
       headStyles: { fillColor: [247, 249, 251], textColor: [0, 0, 0] },
@@ -116,36 +114,39 @@ export default function PaymentSuccess() {
         1: { cellWidth: pageW - marginX * 2 - 130 },
       },
       margin: { left: marginX, right: marginX },
-      theme: "grid",
+      theme: 'grid',
     });
 
     const footerY = (doc.lastAutoTable?.finalY || 200) + 18;
     doc.setFontSize(9);
     doc.setTextColor(120, 120, 120);
-    doc.text(
-      "Thank you for your payment. This is a system-generated receipt.",
-      marginX,
-      footerY
-    );
+    doc.text('Thank you for your payment. This is a system-generated receipt.', marginX, footerY);
 
-    doc.save(`receipt_${data.reference || "payment"}.pdf`);
+    doc.save(`receipt_${data.reference || 'payment'}.pdf`);
   };
 
   const HeaderBar = () => (
     <Header
       style={{
-        background: "#fff",
-        borderBottom: "1px solid #f0f0f0",
-        padding: "0 16px",
+        background: '#fff',
+        borderBottom: '1px solid #f0f0f0',
+        padding: '0 16px',
         height: 56,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        position: 'fixed',
+        top: 0,
+        zIndex: 10,
+        width: '100%',
+        maxWidth: 420,
       }}
     >
       <Space size="middle" align="center">
         <Button type="text" icon={<LeftOutlined />} onClick={() => navigate(-1)} />
-        <Text strong style={{ fontSize: 16 }}>Payments</Text>
+        <Text strong style={{ fontSize: 16 }}>
+          Payments
+        </Text>
       </Space>
       <Space>
         <Button type="text" icon={<BellOutlined />} />
@@ -154,25 +155,44 @@ export default function PaymentSuccess() {
   );
 
   const NavItem = ({ icon, label, active }) => (
-    <Space direction="vertical" size={0} style={{ justifyContent: "center", alignItems: "center" }}>
-      <div style={{ fontSize: 20, color: active ? "#00C853" : "#8c8c8c", lineHeight: 1 }}>{icon}</div>
-      <Text style={{ fontSize: 12, color: active ? "#00C853" : "#8c8c8c" }}>{label}</Text>
+    <Space direction="vertical" size={0} style={{ justifyContent: 'center', alignItems: 'center' }}>
+      <div style={{ fontSize: 20, color: active ? '#00C853' : '#8c8c8c', lineHeight: 1 }}>
+        {icon}
+      </div>
+      <Text style={{ fontSize: 12, color: active ? '#00C853' : '#8c8c8c' }}>{label}</Text>
     </Space>
   );
+
+  NavItem.propTypes = {
+    icon: PropTypes.node.isRequired,
+    label: PropTypes.string.isRequired,
+    active: PropTypes.bool,
+  };
+
+  NavItem.defaultProps = {
+    active: false,
+  };
 
   const BottomNav = () => (
     <Footer
       style={{
-        background: "#fff",
-        borderTop: "1px solid #f0f0f0",
-        padding: "8px 12px calc(8px + env(safe-area-inset-bottom))",
+        background: '#fff',
+        borderTop: '1px solid #f0f0f0',
+        padding: '8px 12px calc(8px + env(safe-area-inset-bottom))',
+        position: 'fixed',
+        bottom: 0,
+        zIndex: 10,
+        width: '100%',
+        maxWidth: 420,
+        left: '50%',
+        transform: 'translateX(-50%)',
       }}
     >
       <div
         style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
-          textAlign: "center",
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          textAlign: 'center',
           gap: 4,
         }}
       >
@@ -186,8 +206,10 @@ export default function PaymentSuccess() {
 
   if (loading) {
     return (
-      <Layout style={{ minHeight: "100dvh", background: "#f7f9fb", maxWidth: 420, margin: "0 auto" }}>
-        <Content style={{ padding: 32, textAlign: "center" }}>
+      <Layout
+        style={{ minHeight: '100dvh', background: '#f7f9fb', maxWidth: 420, margin: '0 auto' }}
+      >
+        <Content style={{ padding: 32, textAlign: 'center' }}>
           <Spin size="large" />
         </Content>
       </Layout>
@@ -196,8 +218,10 @@ export default function PaymentSuccess() {
 
   if (!data) {
     return (
-      <Layout style={{ minHeight: "100dvh", background: "#f7f9fb", maxWidth: 420, margin: "0 auto" }}>
-        <Content style={{ padding: 32, textAlign: "center" }}>
+      <Layout
+        style={{ minHeight: '100dvh', background: '#f7f9fb', maxWidth: 420, margin: '0 auto' }}
+      >
+        <Content style={{ padding: 32, textAlign: 'center' }}>
           <Result status="error" title="Payment Not Found" />
         </Content>
       </Layout>
@@ -205,25 +229,26 @@ export default function PaymentSuccess() {
   }
 
   return (
-    <ConfigProvider
-      theme={{ token: { colorPrimary: "#00C853", borderRadius: 12, fontSize: 14 } }}
-    >
+    <ConfigProvider theme={{ token: { colorPrimary: '#00C853', borderRadius: 12, fontSize: 14 } }}>
       <Layout
         style={{
-          minHeight: "100dvh",
-          background: "#f7f9fb",
+          minHeight: '100dvh',
+          background: '#f7f9fb',
           maxWidth: 420,
-          margin: "0 auto",
-          boxShadow: "0 0 0 1px rgba(0,0,0,0.02), 0 8px 24px rgba(0,0,0,0.06)",
+          margin: '0 auto',
+          boxShadow: '0 0 0 1px rgba(0,0,0,0.02), 0 8px 24px rgba(0,0,0,0.06)',
         }}
       >
         <HeaderBar />
-        <Content style={{ padding: 16 }}>
-          <Card style={{ borderRadius: 16, padding: 0, overflow: "hidden" }} bodyStyle={{ padding: 0 }}>
-            <div style={{ padding: "20px 16px 0" }}>
+        <Content style={{ padding: 16, marginTop: 56, paddingBottom: 88 }}>
+          <Card
+            style={{ borderRadius: 16, padding: 0, overflow: 'hidden' }}
+            bodyStyle={{ padding: 0 }}
+          >
+            <div style={{ padding: '20px 16px 0' }}>
               <Result
                 status="success"
-                icon={<CheckCircleFilled style={{ color: "#00C853" }} />}
+                icon={<CheckCircleFilled style={{ color: '#00C853' }} />}
                 title={
                   <div style={{ marginTop: -8 }}>
                     <Text type="secondary">Payment Success!</Text>
@@ -239,29 +264,33 @@ export default function PaymentSuccess() {
               />
             </div>
 
-            <div style={{ padding: "0 16px 8px" }}>
+            <div style={{ padding: '0 16px 8px' }}>
               <Descriptions
                 column={1}
                 colon={false}
-                labelStyle={{ color: "#8c8c8c" }}
+                labelStyle={{ color: '#8c8c8c' }}
                 contentStyle={{ fontWeight: 600 }}
                 items={[
-                  { key: "ref", label: "Ref Number", children: data.reference || "-" },
-                  { key: "time", label: "Payment Time", children: safeDateTime(data.paidAt) },
-                  { key: "method", label: "Payment Method", children: data?.paymentMethod?.title || "Card Payment" },
-                  { key: "sender", label: "Sender Name", children: data?.senderName || "-" },
-                  { key: "amount", label: "Amount", children: `LKR ${data.amount}` },
+                  { key: 'ref', label: 'Ref Number', children: data.reference || '-' },
+                  { key: 'time', label: 'Payment Time', children: safeDateTime(data.paidAt) },
+                  {
+                    key: 'method',
+                    label: 'Payment Method',
+                    children: data?.paymentMethod?.title || 'Card Payment',
+                  },
+                  { key: 'sender', label: 'Sender Name', children: data?.senderName || '-' },
+                  { key: 'amount', label: 'Amount', children: `LKR ${data.amount}` },
                 ]}
               />
             </div>
 
-            <Divider style={{ margin: "8px 0 0" }} />
+            <Divider style={{ margin: '8px 0 0' }} />
 
-            <div style={{ padding: "12px 16px 16px", display: "grid", gap: 12 }}>
+            <div style={{ padding: '12px 16px 16px', display: 'grid', gap: 12 }}>
               <Button block onClick={handleDownload} style={{ height: 44 }}>
                 Download Receipt (PDF)
               </Button>
-              <Button type="primary" block style={{ height: 44 }} onClick={() => navigate("/")}>
+              <Button type="primary" block style={{ height: 44 }} onClick={() => navigate('/')}>
                 Done
               </Button>
             </div>
