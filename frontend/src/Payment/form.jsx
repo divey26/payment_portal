@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Layout,
   Card,
@@ -12,8 +12,8 @@ import {
   Divider,
   message,
   Tag,
-  Modal,            
-} from "antd";
+  Modal,
+} from 'antd';
 import {
   LeftOutlined,
   BellOutlined,
@@ -23,10 +23,11 @@ import {
   CreditCardOutlined,
   UserOutlined,
   BankOutlined,
-} from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
-import { useBalance } from "../context/BalanceContext";
-import axios from "axios";
+} from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import { useBalance } from '../context/BalanceContext';
+import axios from 'axios';
 
 const { Header, Content, Footer } = Layout;
 const { Title, Text } = Typography;
@@ -37,16 +38,15 @@ export default function PaymentPage() {
   const { balance, setBalance } = useBalance();
   const [submitting, setSubmitting] = useState(false);
   const [methods, setMethods] = useState([]);
-  const [timeoutActive, setTimeoutActive] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState(null);
 
   const [showTimeout, setShowTimeout] = useState(false);
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/payments")
+      .get('http://localhost:5000/api/payments')
       .then((res) => setMethods(res.data))
-      .catch(() => message.error("Failed to fetch payment methods"));
+      .catch(() => message.error('Failed to fetch payment methods'));
   }, []);
 
   const timeoutRef = useRef(null);
@@ -55,46 +55,46 @@ export default function PaymentPage() {
   const startTimeout = () => {
     clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(() => {
-      setTimeoutActive(true);
-      setShowTimeout(true); 
-    }, 30000); // 30 seconds
-    setTimeoutActive(true);
+      setShowTimeout(true);
+    }, 20000); // 10 seconds
   };
 
   // Clear/stop the timeout
   const clearTimeoutFn = () => {
     clearTimeout(timeoutRef.current);
-    setTimeoutActive(false);
   };
 
   useEffect(() => {
     startTimeout(); // start on mount
-    return () => clearTimeoutFn(); 
+    return () => clearTimeoutFn();
   }, []);
 
   // Prefill when a method is selected
   useEffect(() => {
     if (selectedMethod) {
       form.setFieldsValue({
-        cardNumber: selectedMethod.cardNumber || "",
-        expiry: selectedMethod.expiry || "",
-        cvc: selectedMethod.cvc || "",
+        cardNumber: selectedMethod.cardNumber || '',
+        expiry: selectedMethod.expiry || '',
+        cvc: selectedMethod.cvc || '',
       });
     }
   }, [selectedMethod, form]);
 
   // ---- helpers ----
-  const formatCard = (v = "") =>
-    v.replace(/\D/g, "").slice(0, 16).replace(/(\d{4})(?=\d)/g, "$1 ");
-  const formatExpiry = (v = "") =>
+  const formatCard = (v = '') =>
     v
-      .replace(/\D/g, "")
+      .replace(/\D/g, '')
+      .slice(0, 16)
+      .replace(/(\d{4})(?=\d)/g, '$1 ');
+  const formatExpiry = (v = '') =>
+    v
+      .replace(/\D/g, '')
       .slice(0, 4)
-      .replace(/(\d{2})(\d{1,2})?/, (_, m, y = "") => (y ? `${m}/${y}` : m));
+      .replace(/(\d{2})(\d{1,2})?/, (_, m, y = '') => (y ? `${m}/${y}` : m));
 
   const isExpiryValid = (mmYY) => {
     if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(mmYY)) return false;
-    const [mmStr, yyStr] = mmYY.split("/");
+    const [mmStr, yyStr] = mmYY.split('/');
     const mm = Number(mmStr);
     const yy = Number(yyStr);
     const expYear = 2000 + yy;
@@ -103,40 +103,41 @@ export default function PaymentPage() {
     return exp >= now;
   };
 
-// pages/PaymentPage.jsx (inside onFinish)
-const onFinish = async (values) => {
-  const amount = parseFloat(values.amount);
+  const onFinish = async (values) => {
+    const amount = parseFloat(values.amount);
 
-  if (isNaN(amount) || amount <= 0) {
-    message.warning("Please enter a valid payment amount 💳");
-    return;
-  }
-  if (!isExpiryValid(values.expiry)) {
-    message.error("Card has expired or the date is invalid.");
-    return;
-  }
+    if (isNaN(amount) || amount <= 0) {
+      message.warning('Please enter a valid payment amount 💳');
+      return;
+    }
+    if (!isExpiryValid(values.expiry)) {
+      message.error('Card has expired or the date is invalid.');
+      return;
+    }
 
-  setSubmitting(true);
+    setSubmitting(true);
 
-  try {
-    // ✅ decide status client-side using your existing logic
-    const status = amount <= balance ? "success" : "failed";
+    try {
+      const res = await axios.post('http://localhost:5000/api/bills', {
+        amount: values.amount,
+        paymentMethod: selectedMethod ? selectedMethod._id || selectedMethod.id : null,
+        senderName: values.cardName,
+      });
 
-    const res = await axios.post("http://localhost:5000/api/bills", {
-      amount: values.amount,
-      paymentMethod: selectedMethod ? selectedMethod._id || selectedMethod.id : null,
-      senderName: values.cardName,
-      status, // ✅ save it at creation
-    });
-
-    if (status === "success") {
-      const newBalance = balance - amount;
-      setBalance(newBalance);
+      if (amount <= balance) {
+        const newBalance = balance - amount;
+        setBalance(newBalance);
+        clearTimeoutFn();
+        form.resetFields();
+        navigate(`/success/${res.data._id}`);
+      } else {
+        navigate('/');
+      }
+    } catch (err) {
       clearTimeoutFn();
-      form.resetFields();
-      navigate(`/success/${res.data._id}`);
-    } else {
-      navigate(`/unsuccess/${res.data._id}`);
+      message.error('Failed to store payment');
+    } finally {
+      setSubmitting(false);
     }
   } catch (err) {
     clearTimeoutFn();
@@ -148,16 +149,16 @@ const onFinish = async (values) => {
 
 
   return (
-    <Layout style={{ minHeight: "100vh", background: "#fff" }}>
+    <Layout style={{ minHeight: '100vh', background: '#fff' }}>
       {/* Top App Bar */}
       <Header
         style={{
-          background: "#fff",
-          borderBottom: "1px solid #f0f0f0",
-          padding: "0 16px",
-          lineHeight: "56px",
+          background: '#fff',
+          borderBottom: '1px solid #f0f0f0',
+          padding: '0 16px',
+          lineHeight: '56px',
           height: 56,
-          position: "sticky",
+          position: 'sticky',
           top: 0,
           zIndex: 10,
         }}
@@ -180,23 +181,23 @@ const onFinish = async (values) => {
         </Row>
       </Header>
 
-      <Content style={{ padding: "16px", paddingBottom: 88 }}>
-        <Space direction="vertical" size={16} style={{ width: "100%" }}>
+      <Content style={{ padding: '16px', paddingBottom: 88 }}>
+        <Space direction="vertical" size={16} style={{ width: '100%' }}>
           {/* Balance card */}
           <Card
             bodyStyle={{ padding: 16 }}
             style={{
-              background: "#16A34A",
-              border: "none",
-              color: "#fff",
+              background: '#16A34A',
+              border: 'none',
+              color: '#fff',
               borderRadius: 12,
             }}
           >
-            <Space direction="vertical" size={0} style={{ width: "100%" }}>
+            <Space direction="vertical" size={0} style={{ width: '100%' }}>
               <Title
                 level={3}
                 style={{
-                  color: "#fff",
+                  color: '#fff',
                   margin: 0,
                   fontWeight: 700,
                   letterSpacing: 0.2,
@@ -204,17 +205,14 @@ const onFinish = async (values) => {
               >
                 LKR {balance.toFixed(2)}
               </Title>
-              <Text style={{ color: "rgba(255,255,255,0.95)" }}>
-                Current Balance
-              </Text>
-
+              <Text style={{ color: 'rgba(255,255,255,0.95)' }}>Current Balance</Text>
             </Space>
           </Card>
 
           {/* Payment Methods List */}
           <div>
             <Text strong>Choose a payment method</Text>
-            <Space direction="vertical" style={{ width: "100%" }} size={8}>
+            <Space direction="vertical" style={{ width: '100%' }} size={8}>
               {methods.map((m) => (
                 <Card
                   key={m._id || m.id}
@@ -222,25 +220,27 @@ const onFinish = async (values) => {
                   style={{
                     borderRadius: 10,
                     border:
-                      selectedMethod && (selectedMethod._id || selectedMethod.id) === (m._id || m.id)
-                        ? "2px solid #20c46b"
-                        : "1px solid #f0f0f0",
+                      selectedMethod &&
+                      (selectedMethod._id || selectedMethod.id) === (m._id || m.id)
+                        ? '2px solid #20c46b'
+                        : '1px solid #f0f0f0',
                     marginBottom: 4,
-                    cursor: "pointer",
+                    cursor: 'pointer',
                     background:
-                      selectedMethod && (selectedMethod._id || selectedMethod.id) === (m._id || m.id)
-                        ? "#e6fff3"
-                        : "#fff",
+                      selectedMethod &&
+                      (selectedMethod._id || selectedMethod.id) === (m._id || m.id)
+                        ? '#e6fff3'
+                        : '#fff',
                   }}
                   bodyStyle={{
                     padding: 10,
-                    display: "flex",
-                    alignItems: "center",
+                    display: 'flex',
+                    alignItems: 'center',
                   }}
                   onClick={() => setSelectedMethod(m)}
                 >
                   <span style={{ marginRight: 10 }}>
-                    {m.kind === "bank" ? <BankOutlined /> : <CreditCardOutlined />}
+                    {m.kind === 'bank' ? <BankOutlined /> : <CreditCardOutlined />}
                   </span>
                   <span>
                     <Text strong>{m.title}</Text>
@@ -250,7 +250,7 @@ const onFinish = async (values) => {
                     </Text>
                   </span>
                   {m.isDefault && (
-                    <Tag color="success" style={{ marginLeft: "auto" }}>
+                    <Tag color="success" style={{ marginLeft: 'auto' }}>
                       Default
                     </Tag>
                   )}
@@ -259,21 +259,16 @@ const onFinish = async (values) => {
             </Space>
           </div>
 
-          <Divider style={{ margin: "8px 0 0" }} />
+          <Divider style={{ margin: '8px 0 0' }} />
 
           <Text strong>Pay with card</Text>
 
-          <Form
-            form={form}
-            layout="vertical"
-            onFinish={onFinish}
-            requiredMark={false}
-          >
+          <Form form={form} layout="vertical" onFinish={onFinish} requiredMark={false}>
             <Form.Item
               label="Amount"
               name="amount"
               style={{ marginBottom: 12 }}
-              rules={[{ required: true, message: "Please enter amount" }]}
+              rules={[{ required: true, message: 'Please enter amount' }]}
             >
               <Input prefix="LKR" type="number" min={0} inputMode="decimal" />
             </Form.Item>
@@ -282,7 +277,7 @@ const onFinish = async (values) => {
               label="Name"
               name="cardName"
               style={{ marginBottom: 12 }}
-              rules={[{ required: true, message: "Please enter the name" }]}
+              rules={[{ required: true, message: 'Please enter the name' }]}
             >
               <Input size="large" placeholder="Name as on card" maxLength={40} />
             </Form.Item>
@@ -295,13 +290,13 @@ const onFinish = async (values) => {
               name="cardNumber"
               style={{ marginTop: 8, marginBottom: 12 }}
               rules={[
-                { required: true, message: "Card number is required" },
+                { required: true, message: 'Card number is required' },
                 {
                   validator: (_, v) => {
-                    const digits = (v || "").replace(/\s/g, "");
+                    const digits = (v || '').replace(/\s/g, '');
                     return digits.length === 16
                       ? Promise.resolve()
-                      : Promise.reject(new Error("Enter a 16-digit card number"));
+                      : Promise.reject(new Error('Enter a 16-digit card number'));
                   },
                 },
               ]}
@@ -311,9 +306,7 @@ const onFinish = async (values) => {
                 size="large"
                 placeholder="1234 5678 1234 5678"
                 maxLength={19}
-                onChange={(e) =>
-                  form.setFieldValue("cardNumber", formatCard(e.target.value))
-                }
+                onChange={(e) => form.setFieldValue('cardNumber', formatCard(e.target.value))}
               />
             </Form.Item>
 
@@ -323,8 +316,8 @@ const onFinish = async (values) => {
                   name="expiry"
                   style={{ marginBottom: 12 }}
                   rules={[
-                    { required: true, message: "Expiry is required" },
-                    { pattern: /^(0[1-9]|1[0-2])\/\d{2}$/, message: "Use MM/YY" },
+                    { required: true, message: 'Expiry is required' },
+                    { pattern: /^(0[1-9]|1[0-2])\/\d{2}$/, message: 'Use MM/YY' },
                   ]}
                 >
                   <Input
@@ -332,9 +325,7 @@ const onFinish = async (values) => {
                     size="large"
                     placeholder="MM/YY"
                     maxLength={5}
-                    onChange={(e) =>
-                      form.setFieldValue("expiry", formatExpiry(e.target.value))
-                    }
+                    onChange={(e) => form.setFieldValue('expiry', formatExpiry(e.target.value))}
                   />
                 </Form.Item>
               </Col>
@@ -343,8 +334,8 @@ const onFinish = async (values) => {
                   name="cvc"
                   style={{ marginBottom: 12 }}
                   rules={[
-                    { required: true, message: "CVC is required" },
-                    { pattern: /^\d{3,4}$/, message: "3–4 digits" },
+                    { required: true, message: 'CVC is required' },
+                    { pattern: /^\d{3,4}$/, message: '3–4 digits' },
                   ]}
                 >
                   <Input.Password
@@ -367,8 +358,8 @@ const onFinish = async (values) => {
               style={{
                 height: 48,
                 borderRadius: 8,
-                background: "#16A34A",
-                borderColor: "#20c46b",
+                background: '#16A34A',
+                borderColor: '#20c46b',
               }}
             >
               Pay Now
@@ -380,13 +371,13 @@ const onFinish = async (values) => {
       {/* Bottom nav */}
       <Footer
         style={{
-          position: "fixed",
+          position: 'fixed',
           bottom: 0,
           left: 0,
           right: 0,
-          background: "#fff",
-          borderTop: "1px solid #f0f0f0",
-          padding: "6px 8px 10px",
+          background: '#fff',
+          borderTop: '1px solid #f0f0f0',
+          padding: '6px 8px 10px',
         }}
       >
         <Row justify="space-around" align="middle">
@@ -398,7 +389,7 @@ const onFinish = async (values) => {
       </Footer>
 
       {/* ✅ Timeout Popup */}
-     <Modal
+      <Modal
         centered
         open={showTimeout}
         closable={false}
@@ -410,10 +401,10 @@ const onFinish = async (values) => {
             type="primary"
             onClick={() => {
               setShowTimeout(false);
-              clearTimeoutFn();   // stop any existing timer
-              startTimeout();     // start a fresh one
-              message.success("Session restarted");
-              navigate("/");
+              clearTimeoutFn(); // stop any existing timer
+              startTimeout(); // start a fresh one
+              message.success('Session restarted');
+              navigate('/');
             }}
           >
             Restart Again
@@ -424,7 +415,6 @@ const onFinish = async (values) => {
           Your payment session timed out after 30 seconds. You can restart the session to continue.
         </Text>
       </Modal>
-
     </Layout>
   );
 }
@@ -436,7 +426,7 @@ function NavItem({ icon, label, active }) {
         <span
           style={{
             fontSize: 20,
-            color: active ? "#20c46b" : "#8c8c8c",
+            color: active ? '#20c46b' : '#8c8c8c',
             lineHeight: 1,
           }}
         >
@@ -445,7 +435,7 @@ function NavItem({ icon, label, active }) {
         <Typography.Text
           style={{
             fontSize: 12,
-            color: active ? "#20c46b" : "#8c8c8c",
+            color: active ? '#20c46b' : '#8c8c8c',
             fontWeight: active ? 600 : 400,
           }}
         >
@@ -454,11 +444,11 @@ function NavItem({ icon, label, active }) {
         {active && (
           <span
             style={{
-              display: "block",
+              display: 'block',
               width: 28,
               height: 3,
               borderRadius: 999,
-              background: "#20c46b",
+              background: '#20c46b',
               marginTop: 2,
             }}
           />
@@ -467,3 +457,9 @@ function NavItem({ icon, label, active }) {
     </Col>
   );
 }
+
+NavItem.propTypes = {
+  icon: PropTypes.node.isRequired,
+  label: PropTypes.string.isRequired,
+  active: PropTypes.bool.isRequired,
+};

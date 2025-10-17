@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Layout,
   Card,
@@ -12,7 +12,7 @@ import {
   List,
   Divider,
   Badge,
-} from "antd";
+} from 'antd';
 import {
   HomeOutlined,
   HistoryOutlined,
@@ -25,7 +25,7 @@ import {
   InboxOutlined,
   GiftOutlined,
   CheckCircleFilled,
-} from "@ant-design/icons";
+} from '@ant-design/icons';
 
 const { Header, Content, Footer } = Layout;
 const { Title, Text } = Typography;
@@ -33,55 +33,57 @@ const { Title, Text } = Typography;
 export default function Dashboard() {
   // Mock data
   const balance = 1025.44;
-  const nextCollection = { label: "Tomorrow, 9AM" };
+  const nextCollection = { label: 'Tomorrow, 9AM' };
   const stats = [
     {
-      key: "waste",
-      title: "Waste this month",
-      value: "32kg",
-      delta: "+12%",
+      key: 'waste',
+      title: 'Waste this month',
+      value: '32kg',
+      delta: '+12%',
       icon: <InboxOutlined />,
-      deltaColor: "#16a34a",
+      deltaColor: '#16a34a',
     },
     {
-      key: "points",
-      title: "Recycling points",
-      value: "120",
-      delta: "+8%",
+      key: 'points',
+      title: 'Recycling points',
+      value: '120',
+      delta: '+8%',
       icon: <GiftOutlined />,
-      deltaColor: "#16a34a",
+      deltaColor: '#16a34a',
     },
   ];
   const activities = [
     {
-      title: "General Waste Collected",
-      subtitle: "18kg collected from your bin",
-      when: "Today",
+      title: 'General Waste Collected',
+      subtitle: '18kg collected from your bin',
+      when: 'Today',
     },
     {
-      title: "E-waste Drop-off Scheduled",
-      subtitle: "Laptop & two chargers",
-      when: "Yesterday",
+      title: 'E-waste Drop-off Scheduled',
+      subtitle: 'Laptop & two chargers',
+      when: 'Yesterday',
     },
   ];
 
   return (
-    <Layout style={{ minHeight: "100vh", background: "#f6f7fb" }}>
+    <Layout style={{ minHeight: '100vh', background: '#f6f7fb' }}>
       {/* Top App Bar */}
       <Header
         style={{
-          background: "#fff",
+          background: '#fff',
           height: 64,
-          padding: "0 16px",
-          borderBottom: "1px solid #f0f0f0",
+          padding: '0 16px',
+          borderBottom: '1px solid #f0f0f0',
+          position: 'fixed',
+          top: 0,
+          zIndex: 10,
+          width: '100%',
         }}
       >
         <Row align="middle" justify="space-between" gutter={12}>
           <Col>
             <Space align="center">
-              <Avatar style={{ background: "#E6F4FF", color: "#1677ff" }}>
-                JD
-              </Avatar>
+              <Avatar style={{ background: '#E6F4FF', color: '#1677ff' }}>JD</Avatar>
               <Text strong>Dashboard</Text>
             </Space>
           </Col>
@@ -96,32 +98,23 @@ export default function Dashboard() {
         </Row>
       </Header>
 
-      <Content style={{ padding: 16, paddingBottom: 88 }}>
-        <Space direction="vertical" size={20} style={{ width: "100%" }}>
+      <Content style={{ padding: 16, paddingBottom: 88, marginTop: 64 }}>
+        <Space direction="vertical" size={16} style={{ width: '100%' }}>
           {/* Balance Card */}
           <div
             style={{
               borderRadius: 16,
               padding: 16,
-              background:
-                "linear-gradient(135deg, rgba(42,194,133,1) 0%, rgba(45,158,224,1) 100%)",
-              color: "#fff",
-              boxShadow: "0 6px 18px rgba(0,0,0,0.08)",
-              height: 170,
+              background: 'linear-gradient(135deg, rgba(42,194,133,1) 0%, rgba(45,158,224,1) 100%)',
+              color: '#fff',
+              boxShadow: '0 6px 18px rgba(0,0,0,0.08)',
             }}
           >
             <Row justify="space-between" align="top">
               <Col>
-                <Space direction="vertical" size={6} >
-                  <Text style={{ color: "rgba(255,255,255,0.9)" }}>
-                    Current Balance
-                  </Text>
-                  
-                  <Title
-                    level={2}
-                    style={{ color: "#fff", margin: 0, lineHeight: 1.1 }}
-                    marginTop={10}
-                  >
+                <Space direction="vertical" size={6}>
+                  <Text style={{ color: 'rgba(255,255,255,0.9)' }}>Current Balance</Text>
+                  <Title level={2} style={{ color: '#fff', margin: 0, lineHeight: 1.1 }}>
                     LKR {balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </Title>
                   
@@ -129,10 +122,8 @@ export default function Dashboard() {
                   <br/>
                   <Space size={8} align="center">
                     <CalendarOutlined />
-                    <Text style={{ color: "rgba(255,255,255,0.9)" }}>
-                      Next Collection
-                    </Text>
-                    <Text strong style={{ color: "#fff" }}>
+                    <Text style={{ color: 'rgba(255,255,255,0.9)' }}>Next Collection</Text>
+                    <Text strong style={{ color: '#fff' }}>
                       {nextCollection.label}
                     </Text>
                   </Space>
@@ -145,10 +136,10 @@ export default function Dashboard() {
                     style={{
                       marginRight: 0,
                       borderRadius: 32,
-                      padding: "2px 10px",
-                      background: "rgba(255,255,255,0.2)",
-                      color: "#fff",
-                      border: "none",
+                      padding: '2px 10px',
+                      background: 'rgba(255,255,255,0.2)',
+                      color: '#fff',
+                      border: 'none',
                     }}
                   >
                     Paid
@@ -159,9 +150,9 @@ export default function Dashboard() {
                     icon={<RightOutlined />}
                     style={{
                       borderRadius: 24,
-                      border: "none",
-                      background: "rgba(255,255,255,0.9)",
-                      color: "#1677ff",
+                      border: 'none',
+                      background: 'rgba(255,255,255,0.9)',
+                      color: '#1677ff',
                     }}
                   >
                     Details
@@ -179,15 +170,15 @@ export default function Dashboard() {
                   size="small"
                   style={{
                     borderRadius: 12,
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.04)",
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.04)',
                   }}
                 >
-                  <Space direction="vertical" size={6} style={{ width: "100%" }}>
+                  <Space direction="vertical" size={6} style={{ width: '100%' }}>
                     <Row justify="space-between" align="middle">
                       <Col>
                         <Avatar
                           size={32}
-                          style={{ background: "#F6FFED", color: "#52c41a" }}
+                          style={{ background: '#F6FFED', color: '#52c41a' }}
                           icon={s.icon}
                         />
                       </Col>
@@ -211,20 +202,19 @@ export default function Dashboard() {
           <Card
             style={{
               borderRadius: 16,
-              background:
-                "linear-gradient(135deg, rgba(76,201,240,1) 0%, rgba(42,194,133,1) 100%)",
-              color: "#fff",
-              boxShadow: "0 6px 18px rgba(0,0,0,0.06)",
+              background: 'linear-gradient(135deg, rgba(76,201,240,1) 0%, rgba(42,194,133,1) 100%)',
+              color: '#fff',
+              boxShadow: '0 6px 18px rgba(0,0,0,0.06)',
             }}
-            bodyStyle={{ padding: 16 }}
+            styles={{ body: { padding: 16 } }}
           >
             <Row justify="space-between" align="middle" gutter={12}>
               <Col flex="auto">
                 <Space direction="vertical" size={4}>
-                  <Text strong style={{ color: "#fff" }}>
+                  <Text strong style={{ color: '#fff' }}>
                     Recycle E-Waste
                   </Text>
-                  <Text style={{ color: "rgba(255,255,255,0.9)" }}>
+                  <Text style={{ color: 'rgba(255,255,255,0.9)' }}>
                     Schedule a dropoff for electronics
                   </Text>
                 </Space>
@@ -233,22 +223,22 @@ export default function Dashboard() {
                 <Tag
                   style={{
                     borderRadius: 24,
-                    background: "rgba(255,255,255,0.2)",
-                    color: "#fff",
-                    border: "none",
+                    background: 'rgba(255,255,255,0.2)',
+                    color: '#fff',
+                    border: 'none',
                     marginRight: 0,
                   }}
                 >
                   Earn Points
                 </Tag>
-                <div style={{ marginTop: 8, textAlign: "right" }}>
+                <div style={{ marginTop: 8, textAlign: 'right' }}>
                   <Button
                     type="default"
                     style={{
                       borderRadius: 24,
-                      border: "none",
-                      background: "#fff",
-                      color: "#1677ff",
+                      border: 'none',
+                      background: '#fff',
+                      color: '#1677ff',
                     }}
                   >
                     Schedule Now
@@ -265,11 +255,7 @@ export default function Dashboard() {
             </Text>
             <Row gutter={12} style={{ marginTop: 12 }}>
               <Col span={12}>
-                <Button
-                  type="primary"
-                  block
-                  style={{ height: 44, borderRadius: 12 }}
-                >
+                <Button type="primary" block style={{ height: 44, borderRadius: 12 }}>
                   Schedule Pick up
                 </Button>
               </Col>
@@ -279,9 +265,9 @@ export default function Dashboard() {
                   style={{
                     height: 44,
                     borderRadius: 12,
-                    background: "#fff",
-                    borderColor: "#1677ff",
-                    color: "#1677ff",
+                    background: '#fff',
+                    borderColor: '#1677ff',
+                    color: '#1677ff',
                   }}
                 >
                   Schedule Drop-off
@@ -304,23 +290,24 @@ export default function Dashboard() {
             </Col>
           </Row>
 
-          <Card
-            bodyStyle={{ padding: 0 }}
-            style={{ borderRadius: 14, overflow: "hidden" }}
-          >
+          <Card styles={{ body: { padding: 0 } }} style={{ borderRadius: 14, overflow: 'hidden' }}>
             <List
               itemLayout="horizontal"
               dataSource={activities}
               renderItem={(item, idx) => (
                 <>
                   <List.Item
-                    style={{ padding: "12px 16px" }}
-                    actions={[<Text type="secondary">{item.when}</Text>]}
+                    style={{ padding: '12px 16px' }}
+                    actions={[
+                      <Text type="secondary" key={item.title}>
+                        {item.when}
+                      </Text>,
+                    ]}
                   >
                     <List.Item.Meta
                       avatar={
                         <Avatar
-                          style={{ background: "#F6FFED", color: "#52c41a" }}
+                          style={{ background: '#F6FFED', color: '#52c41a' }}
                           icon={<CheckCircleFilled />}
                         />
                       }
@@ -328,9 +315,7 @@ export default function Dashboard() {
                       description={<Text type="secondary">{item.subtitle}</Text>}
                     />
                   </List.Item>
-                  {idx !== activities.length - 1 && (
-                    <Divider style={{ margin: 0 }} />
-                  )}
+                  {idx !== activities.length - 1 && <Divider style={{ margin: 0 }} />}
                 </>
               )}
             />
@@ -341,38 +326,38 @@ export default function Dashboard() {
       {/* Bottom Nav */}
       <Footer
         style={{
-          position: "fixed",
+          position: 'fixed',
           bottom: 0,
           left: 0,
           right: 0,
-          background: "#fff",
-          borderTop: "1px solid #f0f0f0",
-          padding: "8px 12px",
+          background: '#fff',
+          borderTop: '1px solid #f0f0f0',
+          padding: '8px 12px',
         }}
       >
         <Row justify="space-around" align="middle">
           <Col>
             <Space direction="vertical" align="center" size={2}>
-              <HomeOutlined style={{ fontSize: 20, color: "#1677ff" }} />
-              <Text style={{ fontSize: 12, color: "#1677ff" }}>Home</Text>
+              <HomeOutlined style={{ fontSize: 20, color: '#1677ff' }} />
+              <Text style={{ fontSize: 12, color: '#1677ff' }}>Home</Text>
             </Space>
           </Col>
           <Col>
             <Space direction="vertical" align="center" size={2}>
-              <HistoryOutlined style={{ fontSize: 20, color: "#667085" }} />
-              <Text style={{ fontSize: 12, color: "#667085" }}>History</Text>
+              <HistoryOutlined style={{ fontSize: 20, color: '#667085' }} />
+              <Text style={{ fontSize: 12, color: '#667085' }}>History</Text>
             </Space>
           </Col>
           <Col>
             <Space direction="vertical" align="center" size={2}>
-              <CreditCardOutlined style={{ fontSize: 20, color: "#667085" }} />
-              <Text style={{ fontSize: 12, color: "#667085" }}>Payment</Text>
+              <CreditCardOutlined style={{ fontSize: 20, color: '#667085' }} />
+              <Text style={{ fontSize: 12, color: '#667085' }}>Payment</Text>
             </Space>
           </Col>
           <Col>
             <Space direction="vertical" align="center" size={2}>
-              <UserOutlined style={{ fontSize: 20, color: "#667085" }} />
-              <Text style={{ fontSize: 12, color: "#667085" }}>Profile</Text>
+              <UserOutlined style={{ fontSize: 20, color: '#667085' }} />
+              <Text style={{ fontSize: 12, color: '#667085' }}>Profile</Text>
             </Space>
           </Col>
         </Row>
