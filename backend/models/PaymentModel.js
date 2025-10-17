@@ -1,8 +1,8 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const paymentMethodSchema = new mongoose.Schema(
   {
-    kind: { type: String, enum: ["card", "bank"], required: true },
+    kind: { type: String, enum: ['card', 'bank'], required: true },
     title: String,
     subtitle: String,
     cardName: String,
@@ -18,4 +18,4 @@ const paymentMethodSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("PaymentMethod", paymentMethodSchema);
+export default mongoose.model('PaymentMethod', paymentMethodSchema);

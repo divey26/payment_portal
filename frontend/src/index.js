@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import 'antd/dist/reset.css'   // ✅ resets to modern clean style
+import 'antd/dist/reset.css'; // ✅ resets to modern clean style
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 

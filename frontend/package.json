@@ -9,6 +9,7 @@
     "@testing-library/user-event": "^13.5.0",
     "antd": "^5.27.5",
     "axios": "^1.12.2",
+    "dayjs": "^1.11.13",
     "jspdf": "^3.0.3",
     "jspdf-autotable": "^5.0.2",
     "react": "^19.2.0",
@@ -22,6 +23,11 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:coverage": "react-scripts test --coverage --watchAll=false --coverageReporters=text --coverageReporters=text-summary --coverageReporters=lcov --coverageReporters=html --collectCoverageFrom='src/**/*.{js,jsx}' --collectCoverageFrom='!src/index.js' --collectCoverageFrom='!src/reportWebVitals.js' --collectCoverageFrom='!src/**/*.test.{js,jsx}' --collectCoverageFrom='!src/Payment/paymentform.jsx' --collectCoverageFrom='!src/Payment/success.jsx' --collectCoverageFrom='!src/Components/PaymentModal.jsx'",
+    "lint": "eslint src --ext .js,.jsx",
+    "lint:fix": "eslint src --ext .js,.jsx --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -41,5 +47,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "prettier": "^3.6.2"
   }
 }
