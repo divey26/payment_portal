@@ -139,7 +139,14 @@ export default function PaymentPage() {
     } finally {
       setSubmitting(false);
     }
-  };
+  } catch (err) {
+    clearTimeoutFn();
+    message.error("Failed to store payment");
+  } finally {
+    setSubmitting(false);
+  }
+};
+
 
   return (
     <Layout style={{ minHeight: '100vh', background: '#fff' }}>
@@ -160,7 +167,7 @@ export default function PaymentPage() {
           <Col>
             <Space size={12} align="center">
               <LeftOutlined />
-              <Button type="text" onClick={() => navigate(-1)}>
+              <Button type="text" onClick={() => navigate('/')}>
                 Back
               </Button>
             </Space>
@@ -405,8 +412,7 @@ export default function PaymentPage() {
         ]}
       >
         <Text>
-          Your payment session timed out after 10 seconds. You can restart the session to continue.
-          Your payment session timed out after 20 seconds. You can restart the session to continue.
+          Your payment session timed out after 30 seconds. You can restart the session to continue.
         </Text>
       </Modal>
     </Layout>

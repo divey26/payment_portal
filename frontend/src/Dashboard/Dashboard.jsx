@@ -117,6 +117,9 @@ export default function Dashboard() {
                   <Title level={2} style={{ color: '#fff', margin: 0, lineHeight: 1.1 }}>
                     LKR {balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </Title>
+                  
+                  <br/>
+                  <br/>
                   <Space size={8} align="center">
                     <CalendarOutlined />
                     <Text style={{ color: 'rgba(255,255,255,0.9)' }}>Next Collection</Text>

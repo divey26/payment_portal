@@ -22,6 +22,10 @@ import dayjs from 'dayjs';
 import PaymentModal from '../Components/PaymentModal';
 import { useBalance } from '../context/BalanceContext';
 
+// PDF libs
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+
 const { Header, Content, Footer } = Layout;
 const { Title, Text } = Typography;
 
@@ -35,7 +39,7 @@ export default function PaymentsPage() {
   const openAdd = () => setAddOpen(true);
   const closeAdd = () => setAddOpen(false);
 
-  // Fetch payment methods and bills
+  // Fetch payment methods and last 3 bills
   useEffect(() => {
     axios
       .get('http://localhost:5000/api/payments')
@@ -56,6 +60,94 @@ export default function PaymentsPage() {
     } catch {
       message.error('Failed to add payment method');
     }
+  };
+
+  // ---------- PDF helpers ----------
+  const fmtLKR = (n) =>
+    new Intl.NumberFormat("en-LK", {
+      style: "currency",
+      currency: "LKR",
+    }).format(Number(n || 0));
+
+  const safeDateTime = (v) =>
+    v ? new Date(v).toLocaleString() : new Date().toLocaleString();
+
+  const handleDownload = (bill) => {
+    if (!bill) return;
+
+    const doc = new jsPDF({ unit: "pt", format: "a5", orientation: "portrait" });
+    const pageW = doc.internal.pageSize.getWidth();
+    const marginX = 24;
+
+    // Header band
+    doc.setFillColor(0, 200, 83);
+    doc.roundedRect(0, 0, pageW, 64, 0, 0, "F");
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(16);
+    doc.text("Payment Receipt", marginX, 38);
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Reference: ${bill.reference || "-"}`, marginX, 54);
+
+    // PAID badge
+    doc.setDrawColor(255, 255, 255);
+    doc.setLineWidth(1);
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    const paidW = doc.getTextWidth("PAID") + 14;
+    doc.roundedRect(pageW - paidW - marginX, 22, paidW, 20, 6, 6, "S");
+    doc.text("PAID", pageW - paidW - marginX + 7, 37);
+
+    // Body
+    let y = 84;
+    doc.setTextColor(0, 0, 0);
+
+    // Amount big
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.text(fmtLKR(bill.amount), marginX, y);
+
+    // Success text
+    doc.setFontSize(11);
+    doc.setTextColor(0, 200, 83);
+    doc.text("Payment Success", marginX, (y += 18));
+    doc.setTextColor(0, 0, 0);
+
+    const details = [
+      ["Ref Number", bill.reference || "-"],
+      ["Payment Time", safeDateTime(bill.paidAt)],
+      ["Payment Method", bill?.paymentMethod?.title || "Card Payment"],
+      ["Sender Name", bill?.senderName || "-"],
+      ["Amount", fmtLKR(bill.amount)],
+    ];
+
+    autoTable(doc, {
+      startY: y + 12,
+      head: [["Field", "Value"]],
+      body: details,
+      styles: { fontSize: 10, cellPadding: 6 },
+      headStyles: { fillColor: [247, 249, 251], textColor: [0, 0, 0] },
+      alternateRowStyles: { fillColor: [252, 252, 252] },
+      columnStyles: {
+        0: { cellWidth: 130, textColor: [140, 140, 140] },
+        1: { cellWidth: pageW - marginX * 2 - 130 },
+      },
+      margin: { left: marginX, right: marginX },
+      theme: "grid",
+    });
+
+    const footerY = (doc.lastAutoTable?.finalY || 200) + 18;
+    doc.setFontSize(9);
+    doc.setTextColor(120, 120, 120);
+    doc.text(
+      "Thank you for your payment. This is a system-generated receipt.",
+      marginX,
+      footerY
+    );
+
+    doc.save(`receipt_${bill.reference || "payment"}.pdf`);
   };
 
   return (
@@ -141,9 +233,14 @@ export default function PaymentsPage() {
         </Card>
 
         {/* PAYMENT METHODS */}
-        <Title level={5} style={{ margin: 0 }}>
-          Payment Methods
-        </Title>
+        <Row align="middle" justify="space-between" style={{ margin: "8px 0" }}>
+          <Title level={5} style={{ margin: 0 }}>
+            Payment Methods
+          </Title>
+          <Button type="link" style={{ paddingRight: 0 }} onClick={openAdd}>
+            + Add
+          </Button>
+        </Row>
 
         <Space direction="vertical" style={{ width: '100%' }} size={12}>
           {methods.map((m) => (
@@ -233,7 +330,68 @@ export default function PaymentsPage() {
                 </Space>
               </Row>
             </Card>
-          ))}
+          )}
+
+          {bills.map((b) => {
+            const isFailed = ["failed", "unsuccess", "unsuccessful", "unsecces"].includes(
+              String(b.status || "").toLowerCase()
+            );
+
+            return (
+              <Card
+                key={b._id || b.id}
+                hoverable
+                bodyStyle={{ padding: 14 }}
+                style={{
+                  borderRadius: 16,
+                  boxShadow: "0 1px 0 rgba(0,0,0,0.02)",
+                }}
+              >
+                <Row align="middle" justify="space-between">
+                  <Space size={12} align="center">
+                    <Avatar
+                      size={40}
+                      icon={<FileTextOutlined />}
+                      style={{
+                        background: isFailed ? "#ffecec" : "#eafff1",
+                        color: isFailed ? "#ff4d4f" : "#16a34a",
+                      }}
+                    />
+                    <div style={{ lineHeight: 1.1 }}>
+                      <Text strong style={{ display: "block" }}>
+                        {b.month || dayjs(b.paidAt).format("MMMM YYYY")}
+                      </Text>
+                      <Text
+                        type={isFailed ? "danger" : "secondary"}
+                        style={{ fontSize: 12 }}
+                      >
+                        {(isFailed ? "Attempted on " : "Paid on ") +
+                          dayjs(b.paidAt).format("MMMM D, YYYY")}
+                      </Text>
+                    </div>
+                  </Space>
+
+                  <Space size={12} align="center">
+                    <Text
+                      strong
+                      style={{
+                        whiteSpace: "nowrap",
+                        color: isFailed ? "#ff4d4f" : undefined,
+                      }}
+                    >
+                      LKR {b.amount}
+                    </Text>
+                    <Button
+                      type="text"
+                      icon={<DownloadOutlined />}
+                      onClick={() => handleDownload(b)}
+                      title="Download receipt"
+                    />
+                  </Space>
+                </Row>
+              </Card>
+            );
+          })}
         </Space>
       </Content>
 
