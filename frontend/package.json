@@ -18,8 +18,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "craco start",
-    "build": "craco build",
+    "start": "node init && craco start",
+    "build": "node init && craco build",
     "test": "craco test --coverage",
     "eject": "react-scripts eject",
     "lint": "eslint src --ext .js,.jsx",
