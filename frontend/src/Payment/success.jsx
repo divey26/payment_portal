@@ -317,7 +317,7 @@ export default function PaymentSuccess() {
               <Button block onClick={handleDownload} style={{ height: 44 }}>
                 Download Receipt (PDF)
               </Button>
-              <Button type="primary" block style={{ height: 44 }} onClick={() => navigate('/')}>
+              <Button type="primary" block style={{ height: 44 }} onClick={() => navigate('/pay')}>
                 Done
               </Button>
             </div>

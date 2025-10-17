@@ -26,11 +26,14 @@ import {
   GiftOutlined,
   CheckCircleFilled,
 } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 
 const { Header, Content, Footer } = Layout;
 const { Title, Text } = Typography;
 
 export default function Dashboard() {
+  const navigate = useNavigate();
+
   // Mock data
   const balance = 1025.44;
   const nextCollection = { label: 'Tomorrow, 9AM' };
@@ -105,11 +108,12 @@ export default function Dashboard() {
               color: '#fff',
               boxShadow: '0 6px 18px rgba(0,0,0,0.08)',
               height: 170,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
             }}
           >
-            <Row justify="space-between" align="top">
-              <Col>
-                <Space direction="vertical" size={6}>
+            <div>
                   <Text style={{ color: 'rgba(255,255,255,0.9)' }}>Current Balance</Text>
 
                   <Title
@@ -122,48 +126,27 @@ export default function Dashboard() {
                       minimumFractionDigits: 2,
                     })}
                   </Title>
+            </div>
 
-                  <br />
-                  <br />
-                  <Space size={8} align="center">
-                    <CalendarOutlined />
-                    <Text style={{ color: 'rgba(255,255,255,0.9)' }}>Next Collection</Text>
-                    <Text strong style={{ color: '#fff' }}>
-                      {nextCollection.label}
-                    </Text>
-                  </Space>
-                </Space>
-              </Col>
-              <Col>
-                <Space direction="vertical" align="end">
-                  <Tag
-                    color="success"
-                    style={{
-                      marginRight: 0,
-                      borderRadius: 32,
-                      padding: '2px 10px',
-                      background: 'rgba(255,255,255,0.2)',
-                      color: '#fff',
-                      border: 'none',
-                    }}
-                  >
-                    Paid
-                  </Tag>
-                  <Button
-                    size="small"
-                    type="default"
-                    icon={<RightOutlined />}
-                    style={{
-                      borderRadius: 24,
-                      border: 'none',
-                      background: 'rgba(255,255,255,0.9)',
-                      color: '#1677ff',
-                    }}
-                  >
-                    Details
-                  </Button>
-                </Space>
-              </Col>
+            <Row justify="space-between" align="bottom">
+              <Space size={8} align="center">
+                <CalendarOutlined />
+                <Text style={{ color: 'rgba(255,255,255,0.9)' }}>Next Collection</Text>
+                <Text strong style={{ color: '#fff' }}>
+                  {nextCollection.label}
+                </Text>
+              </Space>
+              <Button
+                type="primary"
+                style={{
+                  background: '#fff',
+                  color: '#1677ff',
+                  borderRadius: 8,
+                }}
+                onClick={() => navigate('/pay')}
+              >
+                Pay
+              </Button>
             </Row>
           </div>
 

@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Dashboard from './Dashboard/Dashboard';
 import Payment from './Payment/paymentform';
 import Form from './Payment/form';
+import Login from './login/login';
 import Success from './Payment/success';
 import UnSuccess from './Payment/unsuccess'; // ✅ fixed import (was Success earlier)
 import { BalanceProvider } from './context/BalanceContext';
@@ -48,7 +49,8 @@ function App() {
     <BalanceProvider>
       <Router>
         <Routes>
-          <Route path="/" element={<Payment />} />
+          <Route path="/" element={<Login />} />
+          <Route path="/pay" element={<Payment />} />
           <Route path="/dash" element={<Dashboard />} />
           <Route path="/form" element={<Form />} />
           <Route path="/success/:id" element={<Success />} />
