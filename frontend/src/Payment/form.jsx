@@ -164,7 +164,7 @@ export default function PaymentPage() {
           <Col>
             <Space size={12} align="center">
               <LeftOutlined />
-              <Button type="text" onClick={() => navigate('/')}>
+              <Button type="text" onClick={() => navigate(-1)}>
                 Back
               </Button>
             </Space>
@@ -404,7 +404,7 @@ export default function PaymentPage() {
               clearTimeoutFn(); // stop any existing timer
               startTimeout(); // start a fresh one
               message.success('Session restarted');
-              navigate('/');
+              navigate('/pay');
             }}
           >
             Restart Again

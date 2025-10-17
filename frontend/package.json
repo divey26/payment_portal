@@ -20,8 +20,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "node init && react-scripts start",
+    "build": "node init && react-scripts build",
     "test": "react-scripts test",
     "test:coverage": "react-scripts test --coverage --watchAll=false --coverageReporters=text --coverageReporters=text-summary --coverageReporters=lcov --coverageReporters=html --collectCoverageFrom='src/**/*.{js,jsx}' --collectCoverageFrom='!src/index.js' --collectCoverageFrom='!src/reportWebVitals.js' --collectCoverageFrom='!src/**/*.test.{js,jsx}' --collectCoverageFrom='!src/Payment/paymentform.jsx' --collectCoverageFrom='!src/Payment/success.jsx' --collectCoverageFrom='!src/Components/PaymentModal.jsx'",
     "lint": "eslint src --ext .js,.jsx",

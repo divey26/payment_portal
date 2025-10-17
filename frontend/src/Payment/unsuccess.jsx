@@ -244,7 +244,7 @@ export default function PaymentFailed() {
               <Button type="primary" block style={{ height: 44 }} onClick={() => navigate(-1)}>
                 Try Again
               </Button>
-              <Button block style={{ height: 44 }} onClick={() => navigate('/')}>
+              <Button block style={{ height: 44 }} onClick={() => navigate('/dash')}>
                 Go Home
               </Button>
             </div>
