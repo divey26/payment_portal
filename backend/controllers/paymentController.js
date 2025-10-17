@@ -1,4 +1,4 @@
-import PaymentMethod from "../models/PaymentModel.js";
+import PaymentMethod from '../models/PaymentModel.js';
 
 // Get all payment methods
 export const getPayments = async (req, res) => {
@@ -25,7 +25,7 @@ export const addPayment = async (req, res) => {
 export const deletePayment = async (req, res) => {
   try {
     await PaymentMethod.findByIdAndDelete(req.params.id);
-    res.json({ message: "Payment method deleted" });
+    res.json({ message: 'Payment method deleted' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
